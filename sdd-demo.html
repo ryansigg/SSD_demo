@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Dairyland SDD Demo</title>
+<link href='http://fonts.googleapis.com/css?family=Raleway|Titillium+Web:400,200|Titillium+Web' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="styles.css">
+<!--[if IE]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+<div class="demo-container cf">
+	<div class="main-container">
+		<div class="main-img">
+			<ul>
+				<li class="dc-blocking">Blocking DC</li>
+				<li class="ac-fault">Conducting AC</li>
+				<li class="ac-induction">Conducting AC</li>
+				<li class="dc-conducting">Conducting DC</li>
+				<li class="lightning">Conducting Lightning</li>
+			</ul>				
+			
+			<img class="ac-fault" src="images/ac-fault.png"/>
+			<img class="ac-induction" src="images/ac-current.png"/>
+			<img class="dc-conducting" src="images/dc-current.png"/>
+			<img class="dc-blocking" src="images/dc-blocked.png"/>
+			<img class="lightning" src="images/lightning-surge-01.png"/>
+			
+		</div>
+		<form class="cf">
+			<div class="cf">
+				<div class="form-toggle right"><label>AC Fault</label>
+					<div class="one-step noUi-extended" id="ac-fault"></div>
+				</div>
+				<div class="form-toggle left"><label>Lightning</label>
+					<div class="one-step noUi-extended" id="lightning"></div>
+				</div>
+				<div class="gauge">
+					<div class="arrow"></div>
+					<div class="overlay"></div>
+				</div>
+			</div>
+			<div class="cf">
+				<div class="form-toggle right push"><label>AC Induction</label>
+					<div class="one-step noUi-extended" id="ac-induction"></div>
+				</div>
+				<div class="form-toggle left"><label>DC Blocking Threshold<br/><span>2/2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3/1</span></label>
+					<div class="one-step noUi-extended" id="threshold"></div>
+				</div>
+				<div class="slider push">
+					<label>Applied Voltage</label>
+					<div id="slider1" class="noUi-extended"></div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="sidebar">
+		<aside class="legend"><img src="images/legend-01.jpg"/></aside>
+		<div>
+			<p class="">All Dairyland decouplers block DC and simultaneously ground AC during normal conditions, and provide over-voltage protection during AC fault and lightning conditions. This demonstration can be used to simulate the decoupler&rsquo;s performance during various field conditions.</p>
+			<p class="threshold"><strong>DC Blocking Threshold:</strong> All decouplers have a stated DC blocking threshold voltage, most commonly &nbsp;-3 volts/+1 volt or &ndash;2 volts/+2 volts. Within this range, direct current is blocked, which is desirable in isolating cathodically protected structures from grounding systems and other equipment. &nbsp;Voltages at or beyond these limits put the device into conduction, and the decoupler will pass DC.</p>
+			<p class="ac-induction"><strong>AC Induction:</strong> Dairyland decouplers such as the PCR and SSD carry steady-state AC current ratings, commonly 45A rms, and are suitable for environments where induced AC is present. Decouplers conduct steady-state current in all conditions, allowing induced current to be shunted to a nearby grounding system. Decouplers can mitigate AC while still blocking CP current.</p>
+			<p class="ac-fault"><strong>AC Fault Current:</strong> All Dairyland devices have a stated AC fault current rating, commonly stated as 3.7kA, 5kA etc. During AC fault events, the Dairyland devices are in full conduction, allowing DC and AC to flow for the short duration of the fault event. &nbsp;After an AC fault event has passed, the device instantly reverts back to normal DC blocking and AC conducting mode.</p>
+			<p class="lightning"><strong>Lightning Current:</strong> Dairyland devices have high lightning current ratings, most commonly 100kA. &nbsp;Similar to AC fault events, Dairyland devices are triggered into the full conduction mode during lightning events and provide over-voltage protection between the connection points. &nbsp;Decouplers automatically return to the normal DC blocking mode after the event has passed.</p>
+		</div>
+	</div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="noUiSlider/jquery.nouislider.all.js"></script>
+<link rel="stylesheet" href="noUiSlider/jquery.nouislider.css">
+<link rel="stylesheet" href="noUiSlider/jquery.nouislider.pips.css">
+
+<script>
+	$(document).ready(function() {
+		$.preloadImages = function() {
+		  for (var i = 0; i < arguments.length; i++) {
+		    $("<img />").attr("src", arguments[i]);
+		  }
+		}
+		
+		$.preloadImages("images/gauge-bkg-02.png");
+// 		Applied Voltage Slider
+		$("#slider1").noUiSlider({
+			start: 0,
+			step: 1,
+			behaviour: 'tap',
+			range: {
+				'min': -3,
+				'max': 3
+			},
+			format: wNumb({
+			decimals: 0
+			})
+		});
+		$("#slider1").on({
+			slide: function(event, value){
+				var topMax;
+				var bottomMax;
+				
+				if($('#threshold').val() == 0 && ($('#slider1').val() >= 2 || $('#slider1').val() <= -2)){
+					$('.gauge').addClass('warning');
+					$('.dc-blocking').hide();
+					$('.dc-conducting').show();
+					topMax = 2; bottomMax = -2;
+				}
+				else if($('#threshold').val() == 1 && ($('#slider1').val() >=1 || $('#slider1').val() <= -3)){
+					$('.gauge').addClass('warning');
+					$('.dc-blocking').hide();
+					$('.dc-conducting').show();
+					topMax = 1; bottomMax = -3;
+				}
+				else {
+					$('.gauge').removeClass('warning');
+					$('.dc-blocking').show();
+					$('.dc-conducting').hide();				
+				}
+				
+				if ( value < bottomMax ) {
+					var meter = $(this).val(bottomMax);
+				} else if ( value > topMax ) {
+					var meter = $(this).val(topMax);
+				}
+				else {
+					var meter = $(this).val();
+				}
+				meter = meter*14.5;
+// 				rotate degrees: -44, -29, -13, 12, 29, 44
+				$(".arrow").css({transform: 'rotateZ('+meter+'deg)'})
+				$(".arrow").css({ 'ms-transform': 'rotate('+meter+'deg)' }); 
+			}
+		});
+		$("#slider1").Link('lower').to('-inline-<div class="tooltip"></div>', function ( value ) {	
+			// The tooltip HTML is 'this', so additional
+			// markup can be inserted here.
+			$(this).html(
+				'<span>' + value + '</span>'
+			);
+		});
+	});
+// 	Toggle Sliders
+	function toggle( value ){
+		$(this).toggleClass('off', value === "0");
+	}
+	$(".one-step").noUiSlider({
+		orientation: "horizontal",
+		start: 0,
+ 		behaviour: 'tap',
+		range: {
+			'min': [0, 1],
+			'max': 1
+		},
+		format: wNumb({
+			decimals: 0
+		})
+	})
+	$(".one-step").on({
+		slide: function(event, value){
+			var slideName = $(this).attr("id");
+			var slideVal = $(this).val();
+
+			var meter = $('#slider1').val();			
+			var options = $('#slider1').noUiSlider('options');
+			// console.log(bottomMax);
+			var bottomMax = options.range.min;
+			var topMax = options.range.max;
+			// alert(slideVal);
+
+			var slideToggle = false;
+			if ( slideVal == 1 ) {
+				slideToggle = true;
+			}
+			$('.' + slideName).toggle(slideToggle);
+			if(slideName === 'lightning'){
+				$('.demo-container').toggleClass('lightning-bkg', slideToggle);
+				$('.gauge').addClass('warning');
+					
+			}
+			else if(slideName === 'ac-fault'){	
+
+				if($('#ac-induction').val() == 1 && slideVal == 1) {
+					$('.ac-induction').toggle(false);
+				}
+				else if($('#ac-induction').val() == 1 && slideVal == 0) {
+					$('.ac-induction').toggle(true);
+				}
+				// alert(!slideToggle);
+			}
+			else if(slideName === 'ac-induction'){	
+				if($('#ac-fault').val() == 1 && slideVal == 1) {
+					$('.ac-induction').toggle(false);
+				}			
+			}
+			else if(slideName === 'threshold'){	
+				
+				if($('#threshold').val() == 0 && ($('#slider1').val() >= 2 || $('#slider1').val() <= -2)){
+					$('.gauge').addClass('warning');
+					$('.dc-blocking').hide();
+					$('.dc-conducting').show();
+					topMax = 2; bottomMax = -2;
+				}
+				else if($('#threshold').val() == 1 && ($('#slider1').val() >=1 || $('#slider1').val() <= -3)){
+					$('.gauge').addClass('warning');
+					$('.dc-blocking').hide();
+					$('.dc-conducting').show();
+					topMax = 1; bottomMax = -3;
+				}
+				else {
+					$('.gauge').removeClass('warning');
+					$('.dc-blocking').show();
+					$('.dc-conducting').hide();
+				}
+								
+				if ( $("#slider1").val() < bottomMax ) {
+					$("#slider1").val(bottomMax);
+					meter = bottomMax;
+					
+				} else if ( $("#slider1").val() > topMax ) {
+					$("#slider1").val(topMax);
+					meter = topMax;
+				}
+				
+				// console.log(meter);
+				meter = meter*14.5;
+// 				rotate degrees: -44, -29, -13, 12, 29, 44
+				$(".arrow").css({transform: 'rotateZ('+meter+'deg)'})
+				$(".arrow").css({ 'ms-transform': 'rotate('+meter+'deg)' }); 
+			}
+		} // End Slide
+	});
+	
+	$(".one-step").addClass('toggle');
+	
+	$(".one-step").Link('lower').to(toggle);
+</script>
+</body>
+</html>

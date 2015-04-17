@@ -59,20 +59,22 @@
 		<aside class="legend"><img src="images/legend-01.jpg"/></aside>
 		<div>
 			<p class="">All Dairyland decouplers block DC and simultaneously ground AC during normal conditions, and provide over-voltage protection during AC fault and lightning conditions. This demonstration can be used to simulate the decoupler&rsquo;s performance during various field conditions.</p>
-			<p class="threshold"><strong>DC Blocking Threshold:</strong> All decouplers have a stated DC blocking threshold voltage, most commonly &nbsp;-3 volts/+1 volt or &ndash;2 volts/+2 volts. Within this range, direct current is blocked, which is desirable in isolating cathodically protected structures from grounding systems and other equipment. &nbsp;Voltages at or beyond these limits put the device into conduction, and the decoupler will pass DC.</p>
-			<p class="ac-induction"><strong>AC Induction:</strong> Dairyland decouplers such as the PCR and SSD carry steady-state AC current ratings, commonly 45A rms, and are suitable for environments where induced AC is present. Decouplers conduct steady-state current in all conditions, allowing induced current to be shunted to a nearby grounding system. Decouplers can mitigate AC while still blocking CP current.</p>
+			<p class=""><strong>DC Blocking Threshold:</strong> All decouplers have a stated DC blocking threshold voltage, most commonly &nbsp;-3 volts/+1 volt or &ndash;2 volts/+2 volts. Within this range, direct current is blocked, which is desirable in isolating cathodically protected structures from grounding systems and other equipment. &nbsp;Voltages at or beyond these limits put the device into conduction, and the decoupler will pass DC.</p>
+			<p class="ac-induction"><strong>AC Induction:</strong> Dairyland decouplers such as the PCR and SSD carry steady-state AC current ratings, commonly 45A rms, and are suitable for environments where induced AC is present. Decouplers conduct steady-state current in all conditions, allowing induced current to be shunted to a nearby grounding system. Decouplers can mitigate AC while still blocking CP current. <span class="ac-fault-induction">AC steady-state induction will rise to the fault induction level upon fault initiation. AC steady-state induction and AC fault induction are the same waveform, but at different peak amplitudes.</span></p>
 			<p class="ac-fault"><strong>AC Fault Current:</strong> All Dairyland devices have a stated AC fault current rating, commonly stated as 3.7kA, 5kA etc. During AC fault events, the Dairyland devices are in full conduction, allowing DC and AC to flow for the short duration of the fault event. &nbsp;After an AC fault event has passed, the device instantly reverts back to normal DC blocking and AC conducting mode.</p>
 			<p class="lightning"><strong>Lightning Current:</strong> Dairyland devices have high lightning current ratings, most commonly 100kA. &nbsp;Similar to AC fault events, Dairyland devices are triggered into the full conduction mode during lightning events and provide over-voltage protection between the connection points. &nbsp;Decouplers automatically return to the normal DC blocking mode after the event has passed.</p>
 		</div>
 	</div>
 </div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script> -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script src="noUiSlider/jquery.nouislider.all.js"></script>
 <link rel="stylesheet" href="noUiSlider/jquery.nouislider.css">
 <link rel="stylesheet" href="noUiSlider/jquery.nouislider.pips.css">
 
 <script>
 	$(document).ready(function() {
+		
 		$.preloadImages = function() {
 		  for (var i = 0; i < arguments.length; i++) {
 		    $("<img />").attr("src", arguments[i]);
@@ -80,7 +82,8 @@
 		}
 		
 		$.preloadImages("images/gauge-bkg-02.png");
-// 		Applied Voltage Slider
+		
+// 		Setup Applied Voltage Slider
 		$("#slider1").noUiSlider({
 			start: 0,
 			step: 1,
@@ -93,52 +96,60 @@
 			decimals: 0
 			})
 		});
+// 		Applied Voltage Change Event
 		$("#slider1").on({
 			slide: function(event, value){
 				var topMax;
 				var bottomMax;
-				
-				if($('#threshold').val() == 0 && ($('#slider1').val() >= 2 || $('#slider1').val() <= -2)){
-					$('.gauge').addClass('warning');
-					$('.dc-blocking').hide();
-					$('.dc-conducting').show();
-					topMax = 2; bottomMax = -2;
-				}
-				else if($('#threshold').val() == 1 && ($('#slider1').val() >=1 || $('#slider1').val() <= -3)){
-					$('.gauge').addClass('warning');
-					$('.dc-blocking').hide();
-					$('.dc-conducting').show();
-					topMax = 1; bottomMax = -3;
-				}
-				else {
-					$('.gauge').removeClass('warning');
-					$('.dc-blocking').show();
-					$('.dc-conducting').hide();				
-				}
-				
-				if ( value < bottomMax ) {
-					var meter = $(this).val(bottomMax);
-				} else if ( value > topMax ) {
-					var meter = $(this).val(topMax);
-				}
-				else {
-					var meter = $(this).val();
-				}
-				meter = meter*14.5;
-// 				rotate degrees: -44, -29, -13, 12, 29, 44
-				$(".arrow").css({transform: 'rotateZ('+meter+'deg)'})
-				$(".arrow").css({ 'ms-transform': 'rotate('+meter+'deg)' }); 
+					
+// 					Check #slider1 value and return to DC Blocking Threshold limits if over/under
+					if($('#threshold').val() == 0 && ($('#slider1').val() >= 2 || $('#slider1').val() <= -2)){
+						$('.gauge').addClass('warning');
+						$('.dc-blocking').hide();
+						$('.dc-conducting').show();
+						topMax = 2; bottomMax = -2;
+
+					}
+					else if($('#threshold').val() == 1 && ($('#slider1').val() >=1 || $('#slider1').val() <= -3)){
+						$('.gauge').addClass('warning');
+						$('.dc-blocking').hide();
+						$('.dc-conducting').show();
+						topMax = 1; bottomMax = -3;
+
+					}
+					else {
+						$('.gauge').removeClass('warning');
+						$('.dc-blocking').show();
+						$('.dc-conducting').hide();		
+					}
+					
+					if ( value < bottomMax ) {
+						var meter = bottomMax;
+						$(this).val(bottomMax)
+					} else if ( value > topMax ) {
+						var meter = topMax;
+						$(this).val(topMax)
+					}
+					else {
+						var meter = value;
+					}
+					
+//		 			Rotate Gauge - rotate degrees: -44, -29, -13, 12, 29, 44
+					meter = meter*14.5;
+					$(".arrow").css({transform: 'rotateZ('+meter+'deg)'})
+					$(".arrow").css({ 'ms-transform': 'rotate('+meter+'deg)' }); 
 			}
 		});
+		
+// 		Add ToolTip to Applied Voltage Slider
 		$("#slider1").Link('lower').to('-inline-<div class="tooltip"></div>', function ( value ) {	
-			// The tooltip HTML is 'this', so additional
-			// markup can be inserted here.
+			// The tooltip HTML is 'this', so additional markup can be inserted here.
 			$(this).html(
 				'<span>' + value + '</span>'
 			);
 		});
 	});
-// 	Toggle Sliders
+// 	Set Up Toggle Sliders
 	function toggle( value ){
 		$(this).toggleClass('off', value === "0");
 	}
@@ -154,64 +165,120 @@
 			decimals: 0
 		})
 	})
+// Toggle Sliders on Change (slide) event
 	$(".one-step").on({
 		slide: function(event, value){
 			var slideName = $(this).attr("id");
 			var slideVal = $(this).val();
 
+			// var options = $('#slider1').noUiSlider('options');
+// 			Set top/bottom threshold values - note: these are NOT for Min/Max usage as those control the whole slider.
+			var topMax = ($('#threshold').val() == 0) ? "2" : "1";
+			var bottomMax = ($('#threshold').val() == 0) ? "-2" : "-3";
+			
 			var meter = $('#slider1').val();			
-			var options = $('#slider1').noUiSlider('options');
-			// console.log(bottomMax);
-			var bottomMax = options.range.min;
-			var topMax = options.range.max;
-			// alert(slideVal);
 
+//          Set up boolean values for toggle sliders
 			var slideToggle = false;
 			if ( slideVal == 1 ) {
 				slideToggle = true;
 			}
+			
 			$('.' + slideName).toggle(slideToggle);
+			
+// 			Disable #slider1 when Lightning or AC Fault is tripped
+			if($('#lightning').val() == 1 || $('#ac-fault').val() == 1 ) {
+				$('#slider1').attr('disabled', 'disabled');
+			}
+			else {
+				$('#slider1').removeAttr('disabled');
+			}
+			
+// 			Lightning
 			if(slideName === 'lightning'){
 				$('.demo-container').toggleClass('lightning-bkg', slideToggle);
-				$('.gauge').addClass('warning');
-					
+				
+				if(slideVal == 1){
+					$('.gauge').addClass('warning');
+					$("#slider1").val(bottomMax);
+					meter = bottomMax;
+					$('.dc-blocking').hide();
+					$('.dc-conducting').show();
+				}
 			}
+// 			Ac Fault
 			else if(slideName === 'ac-fault'){	
 
+				if(slideVal == 1){
+					$('.gauge').addClass('warning');
+					$("#slider1").val(bottomMax);
+					meter = bottomMax;
+					$('.dc-blocking').hide();
+					$('.dc-conducting').show();
+				}
+
 				if($('#ac-induction').val() == 1 && slideVal == 1) {
+					meter = bottomMax;
 					$('.ac-induction').toggle(false);
+					$('p.ac-induction').toggle(true);
+					$('.ac-fault-induction').toggle(true);
 				}
 				else if($('#ac-induction').val() == 1 && slideVal == 0) {
 					$('.ac-induction').toggle(true);
+					$('.ac-fault-induction').toggle(false);
+					// $('.ac-induction').toggle(false);
 				}
 				// alert(!slideToggle);
 			}
+// 			AC Induction
 			else if(slideName === 'ac-induction'){	
+				// 	Remove AC Induction State if AC Fault is tripped
 				if($('#ac-fault').val() == 1 && slideVal == 1) {
 					$('.ac-induction').toggle(false);
-				}			
+					$('p.ac-induction').toggle(true);
+					$('.ac-fault-induction').toggle(true);
+				}	
+				else if($('#ac-fault').val() == 1 && slideVal == 0) {
+					$('.ac-fault-induction').toggle(false);
+				}
+						
 			}
-			else if(slideName === 'threshold'){	
+// 			DC Blocking Threshold
+			else if(slideName === 'threshold'){		
 				
+// 				Check #slider1 value and return to DC Blocking Threshold limits if over/under
 				if($('#threshold').val() == 0 && ($('#slider1').val() >= 2 || $('#slider1').val() <= -2)){
 					$('.gauge').addClass('warning');
 					$('.dc-blocking').hide();
 					$('.dc-conducting').show();
 					topMax = 2; bottomMax = -2;
 				}
-				else if($('#threshold').val() == 1 && ($('#slider1').val() >=1 || $('#slider1').val() <= -3)){
+				else if($('#threshold').val() == 1 && ($('#slider1').val() >=1)){
 					$('.gauge').addClass('warning');
 					$('.dc-blocking').hide();
 					$('.dc-conducting').show();
-					topMax = 1; bottomMax = -3;
+					topMax = 1; bottomMax = -3;			
 				}
 				else {
 					$('.gauge').removeClass('warning');
 					$('.dc-blocking').show();
-					$('.dc-conducting').hide();
+					$('.dc-conducting').hide();				
 				}
+				
+				
+				if($('#lightning').val() == 1 || $('#ac-fault').val() == 1 ) {
+					$('.gauge').addClass('warning');
+					$('.dc-blocking').hide();
+					$('.dc-conducting').show();
+					$("#slider1").val(bottomMax);
+					meter = bottomMax;
+				}	
 								
-				if ( $("#slider1").val() < bottomMax ) {
+				// console.log(bottomMax+', '+topMax+': '+$("#slider1").val());
+				
+// 				parseFloat on values that are having types changed mid-stream				
+				if (parseFloat($("#slider1").val()) < parseFloat(bottomMax) ) {
+					// console.log(bottomMax+' > '+$("#slider1").val());
 					$("#slider1").val(bottomMax);
 					meter = bottomMax;
 					
@@ -220,18 +287,20 @@
 					meter = topMax;
 				}
 				
-				// console.log(meter);
-				meter = meter*14.5;
-// 				rotate degrees: -44, -29, -13, 12, 29, 44
-				$(".arrow").css({transform: 'rotateZ('+meter+'deg)'})
-				$(".arrow").css({ 'ms-transform': 'rotate('+meter+'deg)' }); 
 			}
-		} // End Slide
+			
+//		 	Rotate Gauge - rotate degrees: -44, -29, -13, 12, 29, 44
+			// console.log(meter);
+			meter = meter*14.5;
+			$(".arrow").css({transform: 'rotateZ('+meter+'deg)'})
+			$(".arrow").css({ 'ms-transform': 'rotate('+meter+'deg)' }); 	
+		}   // End Slide
 	});
 	
 	$(".one-step").addClass('toggle');
 	
 	$(".one-step").Link('lower').to(toggle);
+	
 </script>
 </body>
 </html>

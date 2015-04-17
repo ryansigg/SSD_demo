@@ -86,7 +86,14 @@
 	.sidebar p {
 		display: none;
 	}
-	.sidebar p:first-child {
+	.sidebar p .ac-fault-induction {
+		display: none;
+		text-decoration: underline;
+		font-weight: bold;
+	}
+
+	.sidebar p:first-child,
+	.sidebar p:nth-child(2) {
 		display: block;
 	}
 	form {
@@ -197,8 +204,8 @@
 /* iPad in portrait & landscape */
 
 @media only screen 
-and (min-device-width : 768px) 
-and (max-device-width : 1024px)  {
+/* and (min-device-width : 768px)  */
+and (max-width : 1024px)  {
 	
 	.demo-container {
 		padding: 25px 0;

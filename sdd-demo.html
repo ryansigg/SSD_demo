@@ -58,8 +58,8 @@
 	<div class="sidebar">
 		<aside class="legend"><img src="images/legend-01.jpg"/></aside>
 		<div>
-			<p class="">All Dairyland decouplers block DC and simultaneously ground AC during normal conditions, and provide over-voltage protection during AC fault and lightning conditions. This demonstration can be used to simulate the decoupler&rsquo;s performance during various field conditions.</p>
-			<p class=""><strong>DC Blocking Threshold:</strong> All decouplers have a stated DC blocking threshold voltage, most commonly &nbsp;-3 volts/+1 volt or &ndash;2 volts/+2 volts. Within this range, direct current is blocked, which is desirable in isolating cathodically protected structures from grounding systems and other equipment. &nbsp;Voltages at or beyond these limits put the device into conduction, and the decoupler will pass DC.</p>
+			<p class="static-show">All Dairyland decouplers block DC and simultaneously ground AC during normal conditions, and provide over-voltage protection during AC fault and lightning conditions. This demonstration can be used to simulate the decoupler&rsquo;s performance during various field conditions.</p>
+			<p class="static-show"><strong>DC Blocking Threshold:</strong> All decouplers have a stated DC blocking threshold voltage, most commonly &nbsp;-3 volts/+1 volt or &ndash;2 volts/+2 volts. Within this range, direct current is blocked, which is desirable in isolating cathodically protected structures from grounding systems and other equipment. &nbsp;Voltages at or beyond these limits put the device into conduction, and the decoupler will pass DC.</p>
 			<p class="ac-induction"><strong>AC Induction:</strong> Dairyland decouplers such as the PCR and SSD carry steady-state AC current ratings, commonly 45A rms, and are suitable for environments where induced AC is present. Decouplers conduct steady-state current in all conditions, allowing induced current to be shunted to a nearby grounding system. Decouplers can mitigate AC while still blocking CP current. <span class="ac-fault-induction">AC steady-state induction will rise to the fault induction level upon fault initiation. AC steady-state induction and AC fault induction are the same waveform, but at different peak amplitudes.</span></p>
 			<p class="ac-fault"><strong>AC Fault Current:</strong> All Dairyland devices have a stated AC fault current rating, commonly stated as 3.7kA, 5kA etc. During AC fault events, the Dairyland devices are in full conduction, allowing DC and AC to flow for the short duration of the fault event. &nbsp;After an AC fault event has passed, the device instantly reverts back to normal DC blocking and AC conducting mode.</p>
 			<p class="lightning"><strong>Lightning Current:</strong> Dairyland devices have high lightning current ratings, most commonly 100kA. &nbsp;Similar to AC fault events, Dairyland devices are triggered into the full conduction mode during lightning events and provide over-voltage protection between the connection points. &nbsp;Decouplers automatically return to the normal DC blocking mode after the event has passed.</p>
@@ -73,7 +73,10 @@
 <link rel="stylesheet" href="noUiSlider/jquery.nouislider.pips.css">
 
 <script>
-	$(document).ready(function() {
+	$(document).ready(function() {	
+		function trace(s) {
+		  try { console.log(s) } catch (e) { alert(s) }
+		}
 		
 		$.preloadImages = function() {
 		  for (var i = 0; i < arguments.length; i++) {
@@ -199,22 +202,60 @@
 				$('.demo-container').toggleClass('lightning-bkg', slideToggle);
 				
 				if(slideVal == 1){
-					$('.gauge').addClass('warning');
+// 					record current state of Threshold Slider
+                    // if($.hasData('#slider1')){
+	                if ($('#slider1').data('oldValue') === undefined) {
+                    	$('#slider1').data('oldValue',$('#slider1').val());
+                    	// console.log($('#slider1').data('oldValue'));
+					}
+					
 					$("#slider1").val(bottomMax);
 					meter = bottomMax;
+					$('.gauge').addClass('warning');
 					$('.dc-blocking').hide();
 					$('.dc-conducting').show();
+				}
+				else if(slideVal == 0 && $('#ac-fault').val() != 1 ) {
+					
+                    $("#slider1").val($('#slider1').data('oldValue'));
+                    meter = $('#slider1').data('oldValue');
+                    $('#slider1').removeData('oldValue');
+         
+                    if(meter > parseFloat(bottomMax) && meter < parseFloat(topMax)){
+						$('.gauge').removeClass('warning');
+						$('.dc-blocking').show();
+						$('.dc-conducting').hide();	
+					}
 				}
 			}
 // 			Ac Fault
 			else if(slideName === 'ac-fault'){	
-
+				
 				if(slideVal == 1){
-					$('.gauge').addClass('warning');
+// 					record current state of Threshold Slider
+	                if ($('#slider1').data('oldValue') === undefined) {
+                    	$('#slider1').data('oldValue',$('#slider1').val());
+                    	// console.log($('#slider1').data('oldValue'));
+					}
+					
 					$("#slider1").val(bottomMax);
 					meter = bottomMax;
+					$('.gauge').addClass('warning');
 					$('.dc-blocking').hide();
 					$('.dc-conducting').show();
+				}
+				else if(slideVal == 0 && $('#lightning').val() != 1 ) {
+                    $("#slider1").val($('#slider1').data('oldValue'));
+                    meter = $('#slider1').data('oldValue');
+                    $('#slider1').removeData('oldValue');
+                    
+                    if(meter > parseFloat(bottomMax) && meter < parseFloat(topMax)){
+						$('.gauge').removeClass('warning');
+						$('.dc-blocking').show();
+						$('.dc-conducting').hide();	
+					}
+					// console.log(meter+' '+topMax+' '+bottomMax);
+
 				}
 
 				if($('#ac-induction').val() == 1 && slideVal == 1) {
@@ -288,6 +329,24 @@
 				}
 				
 			}
+			
+/*
+			if (parseFloat($("#slider1").val()) < parseFloat(bottomMax) ) {
+					$('.gauge').addClass('warning');
+					$('.dc-blocking').hide();
+					$('.dc-conducting').show();
+			} 
+			else if ( $("#slider1").val() > topMax ) {
+					$('.gauge').addClass('warning');
+					$('.dc-blocking').hide();
+					$('.dc-conducting').show();
+			}
+			else {
+					$('.gauge').removeClass('warning');
+					$('.dc-blocking').show();
+					$('.dc-conducting').hide();
+			}
+*/
 			
 //		 	Rotate Gauge - rotate degrees: -44, -29, -13, 12, 29, 44
 			// console.log(meter);

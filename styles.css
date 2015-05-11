@@ -86,6 +86,11 @@
 	.sidebar p {
 		display: none;
 	}
+	
+	.sidebar p.static-show {
+		display: block;
+	}
+	
 	.sidebar p .ac-fault-induction {
 		display: none;
 		text-decoration: underline;
@@ -208,7 +213,7 @@
 and (max-width : 1024px)  {
 	
 	.demo-container {
-		padding: 25px 0;
+		padding: 20px 0 0 0;
 		width: 100%;
 	}
 	
@@ -229,15 +234,26 @@ and (max-width : 1024px)  {
 	}
 	
 	.sidebar {
+/*
 		width: 236px;
 		margin-left: 6px;
+*/		
+		margin-left: 10px;
+		width: 232px;
+	}
+	
+	.sidebar .legend > img {
+		margin-left: -8px;
 	}
 	
 	.sidebar > div {
-	  max-height: 810px;
-	  overflow: scroll;
-	  font-size: 12.5px;
-	  padding: 0 8px;
+		max-height: 810px;
+		overflow: scroll;
+		/* 	  font-size: 12.5px; */
+		padding: 0;
+		
+		font-size: 12px;
+		line-height: 14.5px;
 	}
 	.sidebar p {
 	  margin: 0.5em 0;

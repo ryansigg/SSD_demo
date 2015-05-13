@@ -263,4 +263,15 @@ and (max-width : 1024px)  {
 		width: 510px;
 	}
 	
+	/* 	iPad minus UI elements - should be removed if changing to app view */
+	.demo-container {
+	  padding-top: 0;
+	}
+	
+	.sidebar .legend > img {
+	  margin-left: -8px;
+	  width: 90%;
+	}
+
+	
 }

@@ -22,14 +22,14 @@
 		font-family: "Titillium Web", sans-serif;
 		width: 1019px;
 		background: black;
-		padding: 45px;
+		padding: 10px 45px;
 		font-size: 14px;
 		margin: 0 auto;
 	}
 	.demo-container.lightning-bkg {
 		background-image: url("images/lightning-01.jpg");
 		background-repeat: no-repeat;
-		background-position: 45px 45px;
+		background-position: 45px 15px;
 	}
 	.main-container {
 		width: 570px;
@@ -47,9 +47,10 @@
 		left: 20px;
 		padding: 0;
 		margin: 0;
+		width: 27%;
 	}
 	.main-img > ul > li {
-		width: 150px;
+		width: 100%;
 		display: none;
 		padding: 10px 15px;
 		border-radius: 5px;
@@ -69,6 +70,7 @@
 		position: absolute;
 		top: 0;
 		left: 0;
+		width: 100%;
 	}
 	img.dc-blocking {
 		display: block;
@@ -85,6 +87,7 @@
 	}
 	.sidebar p {
 		display: none;
+		line-height: 18px;
 	}
 	
 	.sidebar p.static-show {
@@ -103,7 +106,7 @@
 	}
 	form {
 		clear: left;
-		width: 570px;
+		width: 100%;
 		flex: left;
 		position: relative;
 	}
@@ -210,6 +213,55 @@
 
 @media only screen 
 /* and (min-device-width : 768px)  */
+and (min-width : 1025px)  {
+	.main-container {
+	  width: 500px;
+	}
+	
+	.main-img {
+		background-size: 100%;
+		height: 521px;
+	}
+	.demo-container.lightning-bkg {
+		background-position: 45px 10px;
+	}
+	
+	.sidebar {
+		width: 400px;
+	}
+	
+	.gauge {
+		width: 203px;
+		height: 204px;
+		background-size: cover;
+		margin-left: -106px;
+	}
+	.gauge.warning {
+		background-size: cover;
+	}
+	
+	.arrow {
+		top: 66px;
+	}
+	
+	.overlay {
+		width: 203px;
+		height: 204px;
+		background-size: cover;		
+	}
+	
+	.form-toggle {
+		margin-bottom: 10px;
+	}
+	
+	label > span {
+		margin-top: 11px;
+	}
+	
+}
+
+@media only screen 
+/* and (min-device-width : 768px)  */
 and (max-width : 1024px)  {
 	
 	.demo-container {
@@ -259,9 +311,6 @@ and (max-width : 1024px)  {
 	  margin: 0.5em 0;
 	}
 	
-	form {
-		width: 510px;
-	}
 	
 	/* 	iPad minus UI elements - should be removed if changing to app view */
 	.demo-container {
